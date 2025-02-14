@@ -42,7 +42,7 @@ public interface FileService {
      * @param [String 파일 경로]
      * @return [byte[] 이미지 바이트 배열]
      */
-    public abstract byte[] getImageFile(Path path);
+    public abstract byte[] getImageFile(FileInfoDto info);
 
 
 

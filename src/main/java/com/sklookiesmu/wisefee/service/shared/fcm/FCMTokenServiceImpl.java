@@ -1,4 +1,4 @@
-package com.sklookiesmu.wisefee.service.shared;
+package com.sklookiesmu.wisefee.service.shared.fcm;
 
 import com.sklookiesmu.wisefee.dto.shared.firebase.FCMToken;
 import com.sklookiesmu.wisefee.repository.redis.AuthRepositoryWithRedis;

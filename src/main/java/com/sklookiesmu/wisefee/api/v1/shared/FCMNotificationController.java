@@ -1,13 +1,12 @@
 package com.sklookiesmu.wisefee.api.v1.shared;
 
 import com.sklookiesmu.wisefee.dto.shared.firebase.FCMNotificationRequestDto;
-import com.sklookiesmu.wisefee.service.shared.FCMNotificationService;
+import com.sklookiesmu.wisefee.service.shared.fcm.FCMNotificationService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "푸시알림 API")

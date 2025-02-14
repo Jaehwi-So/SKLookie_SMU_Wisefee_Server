@@ -1,4 +1,4 @@
-package com.sklookiesmu.wisefee.service.shared;
+package com.sklookiesmu.wisefee.service.shared.file;
 
 import com.sklookiesmu.wisefee.common.constant.FileConstant;
 import com.sklookiesmu.wisefee.common.exception.common.FileDownloadException;
@@ -7,31 +7,43 @@ import com.sklookiesmu.wisefee.common.file.FileUtil;
 import com.sklookiesmu.wisefee.domain.Member;
 import com.sklookiesmu.wisefee.dto.shared.file.FileInfoDto;
 import com.sklookiesmu.wisefee.repository.FileRepository;
+import com.sklookiesmu.wisefee.service.aws.S3Service;
+import com.sklookiesmu.wisefee.service.shared.MemberServiceImpl;
 import com.sklookiesmu.wisefee.service.shared.interfaces.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
 @Service
 @Transactional(readOnly = true)
+@ConditionalOnProperty(name = "cloud.aws.active", havingValue = "true")
 @RequiredArgsConstructor
-public class FileServiceImpl implements FileService {
+public class FileServiceAwsImpl implements FileService {
+
     private final FileRepository fileRepository;
     private final MemberServiceImpl memberService;
-    @Value("${upload.directory}")
-    private String uploadDirectory;
+    private final S3Service s3Service;
+
+    /**
+     * [경로를 기반으로 이미지 바이트 스트림 반환]
+     * 해당 경로의 이미지의 바이트 스트림 형태를 얻음
+     * @param [Path 파일 경로]
+     * @return [byte[] 이미지 바이트 배열]
+     */
+    public byte[] getImageFile(FileInfoDto info){
+        byte[] imageBytes = this.s3Service.downloadFile("public", info.getName());
+        return imageBytes;
+    }
 
 
     /**
@@ -60,21 +72,17 @@ public class FileServiceImpl implements FileService {
 
         //저장 파일명을 중복방지 고유명으로 변경
         String newFileName = generateUniqueFileName(originalFileName);
-        Path filePath = Paths.get(uploadDirectory + File.separator + newFileName);
 
-
-        //서버 내부 스토리지에 업로드
-        try {
-            Files.copy(file.getInputStream(), filePath);
-        } catch (IOException e) {
-            throw new FileUploadException("파일 업로드 중 오류가 발생했습니다.");
-        }
+        String path = s3Service.uploadFile(file, "public", newFileName);
 
         return new FileInfoDto(file.getContentType(),
-                file.getOriginalFilename(),
-                filePath.toString(),
+                newFileName,
+                path,
                 Long.toString(file.getSize()));
+
     }
+
+
 
 
     /**
@@ -110,22 +118,6 @@ public class FileServiceImpl implements FileService {
         FileInfoDto info = this.fileRepository.getFilePathById(id);
         return info;
     }
-
-    /**
-     * [경로를 기반으로 이미지 바이트 스트림 반환]
-     * 해당 경로의 이미지의 바이트 스트림 형태를 얻음
-     * @param [Path 파일 경로]
-     * @return [byte[] 이미지 바이트 배열]
-     */
-    public byte[] getImageFile(Path path){
-        try {
-            byte[] imageBytes = Files.readAllBytes(path);
-            return imageBytes;
-        } catch (IOException e) {
-            throw new FileDownloadException("파일 다운로드 중 오류가 발생했습니다.");
-        }
-    }
-
 
 
 
