@@ -21,7 +21,7 @@ public class S3Config {
     @Value("${cloud.aws.auth}")
     private String authType;
 
-    @Value("${cloud.aws.s3.profile}")
+    @Value("${cloud.aws.s3.profile:#{null}}")
     private String profile;
 
     @Bean

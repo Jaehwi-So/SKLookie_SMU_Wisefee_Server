@@ -27,12 +27,16 @@ import java.util.Random;
 @Service
 @Transactional(readOnly = true)
 @ConditionalOnProperty(name = "cloud.aws.active", havingValue = "true")
-@RequiredArgsConstructor
-public class FileServiceAwsImpl implements FileService {
 
-    private final FileRepository fileRepository;
-    private final MemberServiceImpl memberService;
+public class FileServiceAwsImpl extends AbstractFileService {
+
     private final S3Service s3Service;
+
+    public FileServiceAwsImpl(FileRepository fileRepository, MemberServiceImpl memberService, S3Service s3Service) {
+        super(fileRepository, memberService);
+        this.s3Service = s3Service;
+    }
+
 
     /**
      * [경로를 기반으로 이미지 바이트 스트림 반환]
@@ -48,7 +52,7 @@ public class FileServiceAwsImpl implements FileService {
 
     /**
      * [파일 업로드]
-     * Multipart 파일을 입력받아 서버 내부 스토리지에 저장.
+     * Multipart 파일을 입력받아 S3 스토리지에 저장.
      * @param [MultipartFile 파일]
      * @return [FileinfoDto 파일 정보]
      */
@@ -82,58 +86,5 @@ public class FileServiceAwsImpl implements FileService {
 
     }
 
-
-
-
-    /**
-     * [파일정보 저장]
-     * 업로드된 파일 정보를 데이터베이스에 저장
-     * @param [FileInfoDto 파일정보]
-     * @return [Long 파일 PK]
-     */
-    @Transactional
-    public Long addFileInfo(FileInfoDto fileinfo, Long memberPK){
-        com.sklookiesmu.wisefee.domain.File file = new com.sklookiesmu.wisefee.domain.File();
-        file.setFileType(fileinfo.getFileType()); //MIMETYPE(~확장자)
-        file.setFileCapacity(fileinfo.getFileCapacity()); //용량
-        file.setName(fileinfo.getName()); //이름
-        file.setFilePath(fileinfo.getFilePath()); //경로
-        file.setFileInfo(FileConstant.FILE_INFO_NO_USE); //정보
-        file.setDeleted(false);
-
-        Member member = memberService.getMember(memberPK);
-        file.setMember(member);
-
-        this.fileRepository.create(file);
-        return file.getFileId();
-    }
-
-    /**
-     * [해당 ID의 이미지 Info 얻어오기]
-     * 업로드된 파일의 ID를 통해 경로 얻어오기
-     * @param [Long 파일 PK]
-     * @return [FileInfoDto 이미지 Info]
-     */
-    public FileInfoDto getImageInfoById(Long id){
-        FileInfoDto info = this.fileRepository.getFilePathById(id);
-        return info;
-    }
-
-
-
-    /**
-     * [중복방지를 위한 파일 고유명 생성]
-     * @param fileExtension 확장자
-     * @return String 파일 고유이름
-     */
-    private String generateUniqueFileName(String originalFileName) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        // Random 객체 생성
-        Random random = new Random();
-        // 0 이상 100 미만의 랜덤한 정수 반환
-        String randomNumber = Integer.toString(random.nextInt(Integer.MAX_VALUE));
-        String timeStamp = dateFormat.format(new Date());
-        return timeStamp + randomNumber + originalFileName;
-    }
 
 }
