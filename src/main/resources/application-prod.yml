@@ -1,12 +1,16 @@
+aws:
+  secretsmanager:
+    region: ap-northeast-2
 spring:
   config:
+    import: 'aws-secretsmanager:rds!db-25664e62-846e-44ec-ad51-ec82073fbabf'
     activate:
       on-profile: prod
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3307/wisefee-database?characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
-    password: 1111
+    url: jdbc:mariadb://my-db.c7q6mc8m8zw5.ap-northeast-2.rds.amazonaws.com:3306/wisefee-database?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${username}
+    password: ${password}
 
   jpa:
     database-platform: org.hibernate.dialect.MariaDB103Dialect

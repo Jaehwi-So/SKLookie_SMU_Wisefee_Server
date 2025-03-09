@@ -10,6 +10,7 @@ import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvide
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 @ConditionalOnProperty(name = "cloud.aws.active", havingValue = "true")
@@ -35,6 +36,24 @@ public class S3Config {
         }
         else if(authType.equals("role")){
             return S3Client.builder()
+                    .region(Region.of(region))
+                    .credentialsProvider(InstanceProfileCredentialsProvider.create()) // EC2 인스턴스 CredentialProvider 사용
+                    .build();
+        }
+        return null;
+    }
+
+    @Bean
+    public S3Presigner s3Presigner() {
+
+        if(authType.equals("profile")){
+            return S3Presigner.builder()
+                    .region(Region.of(region))
+                    .credentialsProvider(ProfileCredentialsProvider.create(profile)) // CLI 프로파일 사용
+                    .build();
+        }
+        else if(authType.equals("role")){
+            return S3Presigner.builder()
                     .region(Region.of(region))
                     .credentialsProvider(InstanceProfileCredentialsProvider.create()) // EC2 인스턴스 CredentialProvider 사용
                     .build();
