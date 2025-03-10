@@ -1,11 +1,9 @@
 package com.sklookiesmu.wisefee.api.v1.seller;
 
-import com.sklookiesmu.wisefee.common.auth.SecurityUtil;
 import com.sklookiesmu.wisefee.common.constant.AuthConstant;
-import com.sklookiesmu.wisefee.dto.shared.firebase.FCMNotificationRequestDto;
 import com.sklookiesmu.wisefee.service.seller.ProductStatusComponent;
-import com.sklookiesmu.wisefee.service.shared.FCMNotificationService;
-import com.sklookiesmu.wisefee.service.shared.FCMTokenServiceImpl;
+import com.sklookiesmu.wisefee.service.shared.fcm.FCMNotificationService;
+import com.sklookiesmu.wisefee.service.shared.fcm.FCMTokenServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController

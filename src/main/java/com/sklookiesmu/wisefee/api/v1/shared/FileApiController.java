@@ -59,11 +59,10 @@ public class FileApiController {
     public ResponseEntity<byte[]> getImage(@PathVariable Long id){
         // ID를 통해 이미지 파일의 경로를 얻어옴
         FileInfoDto info = this.fileService.getImageInfoById(id);
-        Path imagePath = Paths.get(info.getFilePath());
         String mimeType = info.getFileType();
 
         // 이미지 파일을 바이트 배열로 읽어옴
-        byte[] imageBytes = this.fileService.getImageFile(imagePath);
+        byte[] imageBytes = this.fileService.getImageFile(info);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.valueOf(mimeType))  // 이미지 타입에 맞게 설정

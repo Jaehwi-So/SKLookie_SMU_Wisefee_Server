@@ -8,10 +8,17 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public interface FileService {
+    /**
+     * [경로를 기반으로 이미지 바이트 스트림 반환]
+     * 해당 경로의 이미지의 바이트 스트림 형태를 얻음
+     * @param [String 파일 경로]
+     * @return [byte[] 이미지 바이트 배열]
+     */
+    public abstract byte[] getImageFile(FileInfoDto info);
 
     /**
      * [파일 업로드]
-     * Multipart 파일을 입력받아 서버 내부 스토리지에 저장.
+     * Multipart 파일을 입력받아 스토리지에 저장.
      * @param [MultipartFile 파일]
      * @return [FileinfoDto 파일 정보]
      */
@@ -34,16 +41,6 @@ public interface FileService {
      * @return [FileInfoDto 이미지 Info]
      */
     public abstract FileInfoDto getImageInfoById(Long id);
-
-
-    /**
-     * [경로를 기반으로 이미지 바이트 스트림 반환]
-     * 해당 경로의 이미지의 바이트 스트림 형태를 얻음
-     * @param [String 파일 경로]
-     * @return [byte[] 이미지 바이트 배열]
-     */
-    public abstract byte[] getImageFile(Path path);
-
 
 
 
